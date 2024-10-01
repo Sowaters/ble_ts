@@ -1,5 +1,5 @@
 import React, { useRef, memo } from 'react';  
-import { View, Text, StyleSheet, PanResponder, Animated, Dimensions, Pressable } from 'react-native';  
+import {  Text, StyleSheet, PanResponder, Animated, Pressable } from 'react-native';  
 import tw from 'twrnc';
 
 interface DraggableButtonProps {

@@ -1,25 +1,34 @@
-// src/bluetooth/BluetoothService.ts  
 import { BleManager, Device } from 'react-native-ble-plx'; 
 import requestLocationPermission,{blePermission} from '../../utils/permissionUtils'
-import { setDevices, addScanResult, startScanning, stopScanning, setConnectionStatus } from './bluetoothStatus'  
+import { setDevices, addScanResult, startScanning, stopScanning, setConnectionStatus } from './bluetoothSlice'  
   
 type BleManagerState = 'Unknown' | 'Resetting' | 'Unsupported' | 'Unauthorized' | 'PoweredOff' | 'PoweredOn' | undefined; 
 
-type CallbackType = (result: {status:boolean, message: string|object|any[]|undefined|unknown}) => void;
+type CallbackType = (result: {status:boolean, message?: string|object|any[]|undefined|unknown}) => void;
 
 
 let bleManager:BleManager | null = null
   
 const BluetoothApi = {    
-    init: async() => {
+  init: async(callback?:CallbackType) => {
       try {
             const res = await requestLocationPermission(blePermission);  
-            console.log('initialize'); 
+            console.log('initialize',res); 
             if (res) {    
                 bleManager = new BleManager();
+                callback?.({
+                    status:true
+                });
             }
+            callback?.({
+              status:false
+          });
         }catch(err) {
             console.log('>>> initialize',err);
+            callback?.({
+              status:false,
+              message:err
+          });
         }
   },
   isBluetoothEnabled: async (callback?:CallbackType) => {
@@ -48,7 +57,27 @@ const BluetoothApi = {
           console.error('扫描错误:', error);  
           return;  
         }  
-        console.log(device);
+        if (device) {
+          
+        
+        const deviceData = {
+            id: device.id,
+            name: device.name,
+            rssi: device.rssi,
+            localName: device.localName,
+            manufacturerData: device.manufacturerData,
+            serviceData: device.serviceData,
+            serviceUUIDs: device.serviceUUIDs,
+            solicitedServiceUUIDs: device.solicitedServiceUUIDs,
+            overflowServiceUUIDs: device.overflowServiceUUIDs,
+            txPowerLevel: device.txPowerLevel,
+            isConnectable: device.isConnectable,
+            mtu: device.mtu,
+            rawScanRecord: device.rawScanRecord,
+        };
+        
+        dispatch(addScanResult(deviceData));  
+      }
         
         // 假设你想把每个扫描到的设备都添加到scanResults中  
         // dispatch(addScanResult({ name: device.name, address: device.id }));  

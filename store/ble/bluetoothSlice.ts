@@ -1,19 +1,6 @@
-// src/store/bluetoothSlice.ts  
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';  
-  
-// 定义蓝牙设备的类型  
-interface BluetoothDevice {  
-  name: string;  
-  address: string;  
-}  
-  
-// 定义蓝牙状态的类型  
-interface BluetoothState {  
-  isConnected: boolean;  
-  devices: BluetoothDevice[];  
-  isScanning: boolean;  
-  scanResults: BluetoothDevice[];  
-}  
+
+import {BluetoothDevice,BluetoothState} from '../../types/types'
   
 const initialState: BluetoothState = {  
   isConnected: false,  
@@ -30,7 +17,9 @@ const bluetoothSlice = createSlice({
       state.isConnected = action.payload;  
     },  
     setDevices: (state, action: PayloadAction<BluetoothDevice[]>) => {  
-      state.devices = action.payload;  
+      
+      
+      state.devices = action.payload; 
     },  
     startScanning: (state) => {  
       state.isScanning = true;  
@@ -40,10 +29,29 @@ const bluetoothSlice = createSlice({
       state.isScanning = false;  
     },  
     addScanResult: (state, action: PayloadAction<BluetoothDevice>) => {  
-      state.scanResults.push(action.payload);  
+      
+
+      const newDevice = action.payload;
+      const existingDeviceIndex = state.scanResults.findIndex((device) => device.id === newDevice.id);
+      // console.log(existingDeviceIndex,newDevice.id);
+      
+      if (existingDeviceIndex === -1) {
+        state.scanResults.push(newDevice);
+      }else{
+        state.scanResults[existingDeviceIndex] = {  
+
+          ...state.scanResults[existingDeviceIndex],  
+    
+          rssi: newDevice.rssi,  
+    
+        };
+      }
+
     },  
   },  
 });  
+
+const bleReducer = bluetoothSlice.reducer;
   
 // 导出 action creators 和 slice reducer  
 export const {  
@@ -54,4 +62,4 @@ export const {
   addScanResult,  
 } = bluetoothSlice.actions;  
   
-export default bluetoothSlice.reducer;
+export default bleReducer;
