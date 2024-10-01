@@ -14,6 +14,7 @@ const oldDirPath = path.join(root, 'app');
 const newDirPath = path.join(root, 'app-example');
 const newAppDirPath = path.join(root, 'app');
 
+// 创建index.tsx文件的内容
 const indexContent = `import { Text, View } from "react-native";
 
 export default function Index() {
@@ -31,6 +32,7 @@ export default function Index() {
 }
 `;
 
+// 创建_layout.tsx文件的内容
 const layoutContent = `import { Stack } from "expo-router";
 
 export default function RootLayout() {
@@ -42,18 +44,21 @@ export default function RootLayout() {
 }
 `;
 
+// 重命名/app目录为/app-example
 fs.rename(oldDirPath, newDirPath, (error) => {
   if (error) {
     return console.error(`Error renaming directory: ${error}`);
   }
   console.log('/app moved to /app-example.');
 
+  // 创建新的/app目录
   fs.mkdir(newAppDirPath, { recursive: true }, (error) => {
     if (error) {
       return console.error(`Error creating new app directory: ${error}`);
     }
     console.log('New /app directory created.');
 
+    // 创建index.tsx文件
     const indexPath = path.join(newAppDirPath, 'index.tsx');
     fs.writeFile(indexPath, indexContent, (error) => {
       if (error) {
@@ -61,6 +66,7 @@ fs.rename(oldDirPath, newDirPath, (error) => {
       }
       console.log('app/index.tsx created.');
 
+      // 创建_layout.tsx文件
       const layoutPath = path.join(newAppDirPath, '_layout.tsx');
       fs.writeFile(layoutPath, layoutContent, (error) => {
         if (error) {
