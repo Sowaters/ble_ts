@@ -13,15 +13,14 @@ import {BluetoothDevice} from "@/types/types";
 export default function Index() {
   const dispatch = useDispatch();
 
-  const {scanResults} = useSelector(state => state.ble)
-  const [deviceList,setDeviceList] = useState<BluetoothDevice[]>([{"id": "DA:22:48:B5:A5:B1", "isConnectable": true, "localName": "N/A", "manufacturerData": null, "mtu": 23, "name": "N/A", "overflowServiceUUIDs": null, "rawScanRecord": "AgEGDhaV/hBVjAkwsaW1SCLaBAlOL0EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", "rssi": -97, "serviceData": {"0000fe95-0000-1000-8000-00805f9b34fb": "EFWMCTCxpbVIIto="}, "serviceUUIDs": null, "solicitedServiceUUIDs": null, "txPowerLevel": null},{"id": "DA:22:48:B5:A5:B2", "isConnectable": true, "localName": "N/A", "manufacturerData": null, "mtu": 23, "name": "N/A", "overflowServiceUUIDs": null, "rawScanRecord": "AgEGDhaV/hBVjAkwsaW1SCLaBAlOL0EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", "rssi": -97, "serviceData": {"0000fe95-0000-1000-8000-00805f9b34fb": "EFWMCTCxpbVIIto="}, "serviceUUIDs": null, "solicitedServiceUUIDs": null, "txPowerLevel": null}])
+  // const {scanResults} = useSelector(state => state.ble)
+  const [deviceList,setDeviceList] = useState<BluetoothDevice[]>([])
 
   
   // useEffect(()=>{
   //    const intervalId = setInterval(()=>{
       
   //       setDeviceList([...scanResults])
-  //       console.log(deviceList);
         
   //     },2000)
       
@@ -29,27 +28,27 @@ export default function Index() {
    
   // },[])
 
-  useEffect(()=>{
-    BluetoothApi.init((result)=>{
-      if(result.status){
-        BluetoothApi.isBluetoothEnabled((result1)=>{ 
-          console.log(result1);
+  // useEffect(()=>{
+  //   BluetoothApi.init((result)=>{
+  //     if(result.status){
+  //       BluetoothApi.isBluetoothEnabled((result1)=>{ 
+  //         console.log(result1);
           
-          if(result1.status){
+  //         if(result1.status){
             
-            BluetoothApi.startScanningDevices(dispatch)
-          }
-        })
-      }
+  //           BluetoothApi.startScanningDevices(dispatch)
+  //         }
+  //       })
+  //     }
       
-    })
-  },[])
+  //   })
+  // },[])
 
    
 
  
   const handleConnect = () => {
-    // connect to device
+    
     router.push( '/content' as Href<string>);
   }
 
@@ -57,7 +56,7 @@ export default function Index() {
 
   return (
     <SafeAreaView style={tw`h-full w-full `}>
-      <HeadItem title="设备列表" isBack={false} icon={icons.set}/>
+      <HeadItem title="设备列表" isBack={false} icon={icons.set} handlePress={()=>router.push('/set')}/>
       
       <FlatList 
         data={deviceList}

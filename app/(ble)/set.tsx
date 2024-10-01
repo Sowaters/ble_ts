@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import tw from 'twrnc'
 import icons from '@/constants/icons'
 import { HeadItem } from '@/components'
+import { Href, router } from 'expo-router'
 
 const Set = () => {
   const setList = [ {
@@ -23,28 +24,35 @@ const Set = () => {
   const mailtoLink = `mailto:${emailConfig.email}?subject=${encodeURIComponent(emailConfig.subject)}&body=${encodeURIComponent(emailConfig.body)}`;
  
   const handleItem = (id: number)=>{
-      if(id === 3){
+    switch(id){
+      case 2:
+        router.push('/helps' as Href)
+        break;
+      case 3:
         Linking.openURL(mailtoLink)
-          .then(() => {
-            console.log('Email opened successfully');
-            
-          })
-          .catch((error) => {
-            console.log('Failed to open email: ',error);
-            Alert.alert(
-              "提示",
-              "打开邮件失败，请检查邮件客户端是否可用",
-              [
-                {
-                  text: "Cancel",
-                  onPress: () => console.log("Cancel Pressed"),
-                  style: "cancel"
-                },
-                { text: "OK", onPress: () => console.log("OK Pressed") }
-              ]
-            );
-          })
-      }
+        .then(() => {
+          console.log('Email opened successfully');
+          
+        })
+        .catch((error) => {
+          console.log('Failed to open email: ',error);
+          Alert.alert(
+            "提示",
+            "打开邮件失败，请检查邮件客户端是否可用",
+            [
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel"
+              },
+              { text: "OK", onPress: () => console.log("OK Pressed") }
+            ]
+          );
+        })
+        break;
+    }
+
+      
   } 
   return (
     <SafeAreaView >

@@ -17,7 +17,13 @@ export default function RootLayout() {
           options={{
             headerShown: false,
           }}
-          />  
+          />
+        <Stack.Screen 
+          name="(sets)" 
+          options={{
+            headerShown: false,
+          }}
+          />     
       </Stack>
     </Provider>
   );

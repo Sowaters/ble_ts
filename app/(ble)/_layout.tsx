@@ -1,18 +1,24 @@
 
-import { Href, router, Stack } from 'expo-router'
+import { Stack } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
 
 const Blelayout = () => {
   return (
-    <Stack>
-      <Stack.Screen name='content' 
-      options={{ 
-        headerShown: false,
-        title: 'BLE'
-        }} />
-        <Stack.Screen 
-          name='set' 
-          options={{headerShown: false}} />
-    </Stack>
+    <>
+      <Stack>
+        <Stack.Screen
+          name='content'
+          options={{
+            headerShown: false,
+          }} />
+        <Stack.Screen
+          name='set'
+          options={{ headerShown: false }} />
+
+        
+      </Stack>
+      <StatusBar backgroundColor='#ffffff' style='dark'/>  
+    </>
   )
 }
 

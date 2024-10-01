@@ -1,4 +1,4 @@
-import {  Text, View,ScrollView,TextInput, StatusBar} from 'react-native'
+import {  Text, View,ScrollView,TextInput} from 'react-native'
 import React,{useState, useCallback} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import tw from 'twrnc'
@@ -105,7 +105,6 @@ const Content = () => {
           </View>)}
         </View>  
       </ScrollView>   
-      <StatusBar backgroundColor={'#ffffff'} barStyle={'dark-content'}/>    
     </SafeAreaView>
   )
 }
