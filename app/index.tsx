@@ -13,39 +13,36 @@ import {BluetoothDevice} from "@/types/types";
 export default function Index() {
   const dispatch = useDispatch();
 
-  // const {scanResults} = useSelector(state => state.ble)
+  const {scanResults} = useSelector(state => state.ble)
   const [deviceList,setDeviceList] = useState<BluetoothDevice[]>([])
 
   
-  // useEffect(()=>{
-  //    const intervalId = setInterval(()=>{
+  useEffect(()=>{
+     const intervalId = setInterval(()=>{
       
-  //       setDeviceList([...scanResults])
+        setDeviceList([...scanResults])
         
-  //     },2000)
+      },2000)
       
-  //     return ()=> clearInterval(intervalId)
+      return ()=> clearInterval(intervalId)
    
-  // },[])
+  },[])
 
-  // useEffect(()=>{
-  //   BluetoothApi.init((result)=>{
-  //     if(result.status){
-  //       BluetoothApi.isBluetoothEnabled((result1)=>{ 
-  //         console.log(result1);
+  useEffect(()=>{
+    BluetoothApi.init((result)=>{
+      if(result.status){
+        BluetoothApi.isBluetoothEnabled((result1)=>{ 
+          console.log(result1);
           
-  //         if(result1.status){
+          if(result1.status){
             
-  //           BluetoothApi.startScanningDevices(dispatch)
-  //         }
-  //       })
-  //     }
+            BluetoothApi.startScanningDevices(dispatch)
+          }
+        })
+      }
       
-  //   })
-  // },[])
-
-   
-
+    })
+  },[])
  
   const handleConnect = () => {
     
