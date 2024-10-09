@@ -1,8 +1,8 @@
-import {FlatList } from "react-native";
+import {FlatList,View,Text,Image, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {DeviceItem,HeadItem} from "@/components";
+import {ButtonItem, DeviceItem,HeadItem} from "@/components";
 import tw from "twrnc";
-import { Href, router } from "expo-router";
+import {  router } from "expo-router";
 import icons from "@/constants/icons";
 import BluetoothApi from "@/store/ble/bluetoothApi";
 import { useEffect,useState, useRef, useCallback } from "react";
@@ -19,9 +19,11 @@ export default function Index() {
   const [isConnecting, setIsConnecting] = useState<{[id:string]:boolean}>({});
   const {scanResults} = useSelector((state:RootState) => state.ble)
   const [deviceList,setDeviceList] = useState<BluetoothDevice[]>([])
+  const [filterText,setFilterText] = useState<string>("")
   const [curConnect, setCurConnect] = useState<boolean>(false)
 
-  const scanResultsRef = useRef(scanResults);  
+  const scanResultsRef = useRef(scanResults);
+  const intervalRef = useRef<any>(null); // 用于存储定时器ID的引用  
 
   useEffect(() => {  
     scanResultsRef.current = scanResults;  
@@ -29,16 +31,30 @@ export default function Index() {
   }, [scanResults]);
 
   
+
   useEffect(()=>{
+    console.log(filterText);
+    
+    if (intervalRef.current) {  
+        clearInterval(intervalRef.current);  
+    } 
      const intervalId = setInterval(()=>{
+      const filteredResults = scanResultsRef.current.filter(device =>  
+        device.name?.includes(filterText)??false // 替换 someProperty 和 includes 逻辑以匹配您的数据  
+      );
         
-        setDeviceList([...scanResultsRef.current])
+        setDeviceList(filteredResults)
 
       },2000)
       
-      return ()=> clearInterval(intervalId)
+      intervalRef.current = intervalId;   
+
+      return ()=> {
+        clearInterval(intervalRef.current);  
+        intervalRef.current = null
+      }
    
-  },[])
+  },[filterText])
 
   useEffect(()=>{    
           
@@ -103,11 +119,17 @@ export default function Index() {
   return (
     <SafeAreaView style={tw`h-full w-full `}>
       <HeadItem title="设备列表" isBack={false} icon={icons.set} handlePress={()=>router.push('/set')}/>
-      
+      <View style={tw`flex-row px-4 h-10`}>
+          <TextInput value={filterText}  onChangeText={text=>{setFilterText(text)}} style={tw`border-b bg-gray-100 h-10 w-full rounded-md px-2`} placeholder='根据设备名字过滤' />
+        </View>
       <FlatList 
         data={deviceList}
         renderItem={({item}) => <DeviceItem device={item} isLoading={isConnecting[item.id] || false} handleClick={()=>handleConnect(item.id)} />}
         keyExtractor={(item) => item.id}
+        ListEmptyComponent={() => (<View style={tw`flex mt-50 justify-center items-center`}>
+          <Image source={icons.noData} style={tw`w-40 h-40 `} resizeMode="contain"/>
+          
+        </View>)}
       />
       <Toast position='top' topOffset={50} visibilityTime={2000}/>  
      
