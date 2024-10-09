@@ -15,8 +15,10 @@ const ButtonItem = ({title,handClick,isLoading,bwrapStyle="",textStyle=""}:Butto
     <TouchableOpacity 
         style={tw`bg-[#333] flex flex-row items-center justify-center rounded-md p-2 ${bwrapStyle}`}
         activeOpacity={0.8}
-        onPress={() => {
+        disabled={isLoading}
+        onPress={(e) => {
             // console.log('connect')
+            e.stopPropagation()
             handClick()
         }}
     >

@@ -6,7 +6,16 @@ const initialState: BluetoothState = {
   isConnected: false,  
   devices: [],  
   isScanning: false,  
-  scanResults: [],  
+  scanResults: [], 
+  readParams: {
+    serviceUUID: '',
+    characteristicUUID: '',
+  },
+  writeParams:{
+    serviceUUID: '',
+    isWriteWithoutResponse:true,
+    characteristicUUID: '', 
+  }
 };  
   
 const bluetoothSlice = createSlice({  
@@ -16,9 +25,16 @@ const bluetoothSlice = createSlice({
     setConnectionStatus: (state, action: PayloadAction<boolean>) => {  
       state.isConnected = action.payload;  
     },  
-    setDevices: (state, action: PayloadAction<BluetoothDevice[]>) => {  
-      
-      
+    setReadParms: (state, action: PayloadAction<{serviceUUID: string, characteristicUUID: string}>) => {
+      state.readParams.serviceUUID = action.payload.serviceUUID;
+      state.readParams.characteristicUUID = action.payload.characteristicUUID;
+    },
+    setWriteParms: (state, action: PayloadAction<{serviceUUID: string, characteristicUUID: string, isWriteWithoutResponse: boolean}>) => {
+      state.writeParams.serviceUUID = action.payload.serviceUUID;
+      state.writeParams.characteristicUUID = action.payload.characteristicUUID;
+      state.writeParams.isWriteWithoutResponse = action.payload.isWriteWithoutResponse;
+    },
+    setDevices: (state, action: PayloadAction<BluetoothDevice[]>) => {       
       state.devices = action.payload; 
     },  
     startScanning: (state) => {  
@@ -29,8 +45,6 @@ const bluetoothSlice = createSlice({
       state.isScanning = false;  
     },  
     addScanResult: (state, action: PayloadAction<BluetoothDevice>) => {  
-      
-
       const newDevice = action.payload;
       const existingDeviceIndex = state.scanResults.findIndex((device) => device.id === newDevice.id);
       // console.log(existingDeviceIndex,newDevice.id);
@@ -59,7 +73,9 @@ export const {
   setDevices,  
   startScanning,  
   stopScanning,  
-  addScanResult,  
+  addScanResult,
+  setReadParms,  
+  setWriteParms,
 } = bluetoothSlice.actions;  
   
 export default bleReducer;

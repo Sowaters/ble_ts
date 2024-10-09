@@ -18,10 +18,19 @@ interface BluetoothDevice {
     
 // 定义蓝牙状态的类型  
 interface BluetoothState {  
-isConnected: boolean;  
-devices: BluetoothDevice[];  
-isScanning: boolean;  
-scanResults: BluetoothDevice[];  
+    isConnected: boolean
+    devices: BluetoothDevice[]
+    isScanning: boolean
+    scanResults: BluetoothDevice[],
+    readParams: {
+        serviceUUID: string,
+        characteristicUUID: string,
+    },
+    writeParams:{
+        serviceUUID: string,
+        isWriteWithoutResponse: boolean,
+        characteristicUUID: string, 
+    }
 } 
 
 
