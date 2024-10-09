@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import {Text, TouchableHighlight, View } from 'react-native'
 import React, { memo, useState } from 'react'
 import ButtonItem from './ButtonItem'
 import tw from 'twrnc'

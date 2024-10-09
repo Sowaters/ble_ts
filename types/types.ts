@@ -34,9 +34,27 @@ interface BluetoothState {
 } 
 
 
+interface AddMsgProps {
+    msg:string,
+    type:'recv'|'send'|'Status'|'sendFail',
+    timestr?:string
+}
+interface MsgProps extends AddMsgProps {
+    timestr:string
+}
+
+interface RadioProps {
+    send:number
+    recv:number
+    isLoop:number
+}
+
 export {
     ButtonStyle,
     BluetoothDevice,
     BluetoothState,
-    BleDeviceProps
+    BleDeviceProps,
+    MsgProps,
+    AddMsgProps,
+    RadioProps
 }

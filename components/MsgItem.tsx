@@ -1,23 +1,18 @@
 import { Text, View } from 'react-native'
 import React, { memo } from 'react'
 import tw from 'twrnc'
-import moment from 'moment'
+import { MsgProps } from '@/types/types'
 
-interface MsgProps {
-    msg:string,
-    type:'recv'|'send'|'Status',
-}
-
-const MsgItem = memo(({msg,type}:MsgProps) => {
+const MsgItem = memo(({msg,type,timestr}:MsgProps) => {
     
     
-    const timeStr = moment().format('HH:mm:ss.SSS')//获取当前时间;
     return (
     <View style={tw`flex-row items-center justify-start`}>
-      <Text>{timeStr+'>>'}</Text>
+      <Text>{timestr+'>>'}</Text>
       {type === 'recv'&&<Text style={tw`text-green-500`}>Recv:{msg}</Text>}
       {type === 'send'&&<Text style={tw`text-blue-500`}>Send:{msg}</Text>}
       {type === 'Status'&&<Text>{msg}</Text>}
+      {type === 'sendFail'&&<Text style={tw`text-red-500`}>SendFail:{msg}</Text>}
     </View>
   )
 })

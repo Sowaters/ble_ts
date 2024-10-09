@@ -54,7 +54,8 @@ const BleInfoItem = memo(({uuid,items,curIndex,getSelectIndex,title='Service',na
   const [state, dispatch] = useReducer(reducer, initialState(items));
 
   const handleSelect = useCallback((index:number,status:boolean,action:'R'|'W') => {
-    getSelectIndex(index,curIndex,action,status)
+    
+    getSelectIndex(index,curIndex,action,!status)
     dispatch({ type: action, index });  
   },[])
 

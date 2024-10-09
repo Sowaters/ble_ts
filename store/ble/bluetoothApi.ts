@@ -6,7 +6,7 @@ import { Buffer } from 'buffer';
 
 type BleManagerState = 'Unknown' | 'Resetting' | 'Unsupported' | 'Unauthorized' | 'PoweredOff' | 'PoweredOn' | undefined; 
 
-type CallbackType = (result: {status:boolean, message?: string|object|any[]|undefined|unknown}) => void;
+type CallbackType = (result: {status:boolean, message?: string|object|any[]|undefined|unknown,err?:any}) => void;
 
 
 let bleManager:BleManager | null = null
@@ -85,7 +85,7 @@ const BluetoothApi = {
     try {  
         bleManager?.startDeviceScan(null, null, (error:Error | null, device:Device|null) => {  
         if (error) {  
-          console.error('扫描错误:', error);  
+          // console.error('扫描错误:', error);  
           return;  
         }  
         
@@ -112,7 +112,7 @@ const BluetoothApi = {
       }
       });  
     } catch (error) {  
-      console.error('启动扫描失败:', error);  
+      // console.error('启动扫描失败:', error);  
     }  
   },    
   // 停止扫描蓝牙设备  
@@ -120,17 +120,23 @@ const BluetoothApi = {
     dispatch(stopScanning());  
     await bleManager?.stopDeviceScan();  
   },  
-  connectToDevice: async ( deviceId: string,callback?:CallbackType) => {
+  connectToDevice: async ( deviceId: string,callback?:CallbackType,failcallback?:CallbackType) => {
     try {  
-      const res = await bleManager?.connectToDevice(deviceId);  
+      const res = await bleManager?.connectToDevice(deviceId,{
+        autoConnect:false
+      }); 
       // console.log(res);
-      // return res;
+      console.log('连接设备成功:', deviceId);
       callback?.({
         status: true,
         message: deviceId,
       });
     } catch (error) {  
-      console.error('连接设备失败:', error);
+      console.log('连接设备失败:', error);
+      failcallback?.({
+        status: false,
+        message: error,
+      })
     }  
   },
   discoverAllServicesAndCharacteristicsForDevice: async (deviceId: string,successcallback:CallbackType,failcallback?:CallbackType) => {
@@ -214,7 +220,7 @@ const BluetoothApi = {
           }else{
             if(characteristic?.value){
               let resData = Buffer.from(characteristic.value, 'base64').toString('hex')
-              console.log('接收的数据==>',resData);
+              
               successcallback({
                 status: true,
                 message: resData,
@@ -237,6 +243,8 @@ const BluetoothApi = {
         message: '写入成功',
       }); 
     } catch (error) {
+      console.log('out写入失败', error);
+      
       failcallback?.({
         status: false,
         message: '写入失败',
@@ -252,11 +260,57 @@ const BluetoothApi = {
         message: '写入成功',
       });
     } catch (error) {
+      console.log('写入失败', error);
+      
       failcallback?.({
         status: false,
         message: '写入失败',
       });
     }     
+  },
+  setMTU: async (deviceId: string, mtu: number, successcallback: CallbackType, failcallback?: CallbackType) => {
+    try {
+      await bleManager?.requestMTUForDevice(deviceId, mtu);
+      successcallback({
+        status: true,
+        message: '设置MTU成功',
+      });
+    } catch{
+      failcallback?.({
+        status: false,
+        message: '设置MTU失败',
+      });
+    }
+  },
+  disConnect: async (deviceId: string, successcallback: CallbackType, failcallback?: CallbackType) => {
+    try {
+      await bleManager?.cancelDeviceConnection(deviceId);
+      successcallback({
+        status: true,
+        message: '断开连接成功',
+      });
+    }catch {
+      failcallback?.({
+        status: false,
+        message: '断开连接失败',
+      });
+    }
+  },
+  listenConnected: (deviceId: string,successcallback: CallbackType, failcallback?: CallbackType) => {
+    try {
+      bleManager?.onDeviceDisconnected(deviceId,(device,error)=>{
+        successcallback({
+          status: true,
+          message: device,
+          err: error,
+        })
+      });
+    } catch {
+      failcallback?.({
+        status: false,
+        message: '监听断开连接失败',
+      });
+    }
   },
   asciiToHex(asciiString: string): string {  
       let hexString = '';  
@@ -268,7 +322,25 @@ const BluetoothApi = {
           hexString += hexPair;  
       }  
       return hexString;  
-  } 
+  },
+  hexToAscii(hex: string): string {  
+      // 确保输入的hex字符串长度为偶数，如果不是，则进行填充  
+      if (hex.length % 2 !== 0) {  
+          return "";
+      }  
+    
+      let asciiString = "";  
+      for (let i = 0; i < hex.length; i += 2) {  
+          // 从hex字符串中提取每两个字符作为一个字节  
+          const byteString = hex.substr(i, 2);  
+          // 将字节字符串转换为数字（基数为16）  
+          const byte = parseInt(byteString, 16);  
+          // 将数字转换为对应的ASCII字符并添加到结果字符串中  
+          const asciiChar = String.fromCharCode(byte);  
+          asciiString += asciiChar;  
+      }  
+      return asciiString;  
+  }   
 };  
   
 export default BluetoothApi;

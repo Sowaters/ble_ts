@@ -24,6 +24,17 @@ const bluetoothSlice = createSlice({
   reducers: {  
     setConnectionStatus: (state, action: PayloadAction<boolean>) => {  
       state.isConnected = action.payload;  
+      if(!action.payload){
+        state.readParams = {
+          serviceUUID: '',
+          characteristicUUID: '',
+        },
+        state.writeParams = {
+          serviceUUID: '',
+          isWriteWithoutResponse:true,
+          characteristicUUID: '', 
+        }
+      }
     },  
     setReadParms: (state, action: PayloadAction<{serviceUUID: string, characteristicUUID: string}>) => {
       state.readParams.serviceUUID = action.payload.serviceUUID;
@@ -33,6 +44,7 @@ const bluetoothSlice = createSlice({
       state.writeParams.serviceUUID = action.payload.serviceUUID;
       state.writeParams.characteristicUUID = action.payload.characteristicUUID;
       state.writeParams.isWriteWithoutResponse = action.payload.isWriteWithoutResponse;
+      
     },
     setDevices: (state, action: PayloadAction<BluetoothDevice[]>) => {       
       state.devices = action.payload; 
@@ -47,18 +59,18 @@ const bluetoothSlice = createSlice({
     addScanResult: (state, action: PayloadAction<BluetoothDevice>) => {  
       const newDevice = action.payload;
       const existingDeviceIndex = state.scanResults.findIndex((device) => device.id === newDevice.id);
-      // console.log(existingDeviceIndex,newDevice.id);
       
       if (existingDeviceIndex === -1) {
         state.scanResults.push(newDevice);
       }else{
-        state.scanResults[existingDeviceIndex] = {  
+          state.scanResults[existingDeviceIndex] = {  
 
-          ...state.scanResults[existingDeviceIndex],  
-    
-          rssi: newDevice.rssi,  
-    
-        };
+            ...state.scanResults[existingDeviceIndex],  
+      
+            rssi: newDevice.rssi,  
+      
+          };
+        
       }
 
     },  

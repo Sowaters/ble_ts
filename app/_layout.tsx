@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import  store  from "@/store/";
 import { useEffect } from "react";
 import BluetoothApi from "@/store/ble/bluetoothApi";
+import { StatusBar } from 'expo-status-bar'
 
 export default function RootLayout() {
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function RootLayout() {
           }}
           />     
       </Stack>
+      <StatusBar backgroundColor='#ffffff' style='dark' />
     </Provider>
   );
 }

@@ -1,4 +1,4 @@
-import { StatusBar, Text, View,FlatList } from "react-native";
+import {FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {DeviceItem,HeadItem} from "@/components";
 import tw from "twrnc";
@@ -9,6 +9,8 @@ import { useEffect,useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {BluetoothDevice} from "@/types/types";
 import { RootState } from "@/store";
+import Toast from "react-native-toast-message";
+import { setConnectionStatus } from "@/store/ble/bluetoothSlice";
 
 
 export default function Index() {
@@ -17,10 +19,11 @@ export default function Index() {
   const [isConnecting, setIsConnecting] = useState<{[id:string]:boolean}>({});
   const {scanResults} = useSelector((state:RootState) => state.ble)
   const [deviceList,setDeviceList] = useState<BluetoothDevice[]>([])
+  const [curConnect, setCurConnect] = useState<boolean>(false)
 
   const scanResultsRef = useRef(scanResults);  
-  useEffect(() => {  
 
+  useEffect(() => {  
     scanResultsRef.current = scanResults;  
 
   }, [scanResults]);
@@ -30,6 +33,7 @@ export default function Index() {
      const intervalId = setInterval(()=>{
         
         setDeviceList([...scanResultsRef.current])
+
       },2000)
       
       return ()=> clearInterval(intervalId)
@@ -57,32 +61,42 @@ export default function Index() {
   },[])
  
   const handleConnect = useCallback((id:string) => {
+      if(curConnect){
+        Toast.show({  
+          type: 'error', 
+          text1: '当前正在连接设备，请稍后',
+        });
+        return
+      }
+      
+      setCurConnect(true)
       setIsConnecting((prevState) => ({  
         ...prevState,  
         [id]: true, // 设置该设备为连接中状态  
       }));  
-    // router.push( '/content' as Href<string>);
-    // BluetoothApi.connectToDevice(id)
-      try {
-        const res = BluetoothApi.connectToDevice(id,()=>{
-          BluetoothApi.discoverAllServicesAndCharacteristicsForDevice(id,ret=>{
-            router.push( {pathname:'/content',params:{deviceId:id}});
-          })
-        })    
+      const res = BluetoothApi.connectToDevice(id,()=>{
         
-      } catch (error) {
-       console.log('连接失败',error);
+        setCurConnect(false)
         setIsConnecting((prevState) => ({  
           ...prevState,  
-          [id]: false, // 连接完成后，将设备状态设置为已连接  
+          [id]: false, // 设置该设备为连接中状态  
         }));
-      }finally {
-        // setIsConnecting((prevState) => ({  
-        //   ...prevState,  
-        //   [id]: false, // 连接完成后，将设备状态设置为已连接  
-        // }));
-      }
-  },[])
+        dispatch(setConnectionStatus(true))
+        BluetoothApi.discoverAllServicesAndCharacteristicsForDevice(id,ret=>{
+          router.push( {pathname:'/content',params:{deviceId:id}});
+        })
+      },error=>{
+        Toast.show({  
+          type: 'error', 
+          text1: '连接设备失败',
+        });
+        setCurConnect(false)
+        setIsConnecting((prevState) => ({  
+          ...prevState,  
+          [id]: false, // 设置该设备为连接中状态  
+        }));
+      })  
+  },[curConnect])
 
   
 
@@ -95,8 +109,8 @@ export default function Index() {
         renderItem={({item}) => <DeviceItem device={item} isLoading={isConnecting[item.id] || false} handleClick={()=>handleConnect(item.id)} />}
         keyExtractor={(item) => item.id}
       />
-
-      <StatusBar barStyle={"dark-content"} />
+      <Toast position='top' topOffset={50} visibilityTime={2000}/>  
+     
     </SafeAreaView>
   );
 }
