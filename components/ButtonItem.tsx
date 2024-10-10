@@ -2,6 +2,15 @@ import {  Text, TouchableOpacity, View, ActivityIndicator } from 'react-native'
 import React from 'react'
 import tw from 'twrnc'
 
+/**
+ * ButtonStyle  
+ * @param  bwrapStyle - 按钮容器样式
+ * @param  textStyle - 按钮文字样式
+ * @param  isLoading - loading状态
+ * @param  title - 按钮文字
+ * @param  handClick - 点击事件
+ *  
+ */
 interface ButtonStyle {
     bwrapStyle?: string,
     textStyle?: string,

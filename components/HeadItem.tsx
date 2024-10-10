@@ -1,14 +1,23 @@
+// 导入所需的组件和库
 import { TouchableOpacity, Image, View,Text,ImageSourcePropType  } from 'react-native'
 import React from 'react'
 import icons from '@/constants/icons'
 import tw from 'twrnc'
 import { router } from 'expo-router'
 
+/**
+ * HeadItem组件的props类型
+ * @param icon 图标，可以是ImageSourcePropType类型，也可以是字符串
+ * @param title 标题
+ * @param isBack 是否显示返回按钮
+ * @param handlePress 点击图标时的回调函数
+ *  
+ */
 interface HeadItemProps {
-  icon?: ImageSourcePropType  | string | undefined,
-  title:string,
-  isBack?: boolean,
-  handlePress?: () => void
+  icon?: ImageSourcePropType  | string | undefined,  
+  title:string,  
+  isBack?: boolean,  
+  handlePress?: () => void  
 }
 
 const HeadItem = ({icon='',title,isBack=true,handlePress=()=>{}}:HeadItemProps) => {

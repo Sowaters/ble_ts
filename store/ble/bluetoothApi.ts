@@ -4,14 +4,23 @@ import { setDevices, addScanResult, startScanning, stopScanning, setConnectionSt
 import { Dispatch } from 'redux';
 import { Buffer } from 'buffer';
 
+// 定义蓝牙状态类型
 type BleManagerState = 'Unknown' | 'Resetting' | 'Unsupported' | 'Unauthorized' | 'PoweredOff' | 'PoweredOn' | undefined; 
 
+// 定义回调函数类型
 type CallbackType = (result: {status:boolean, message?: string|object|any[]|undefined|unknown,err?:any}) => void;
 
 
+// 初始化蓝牙管理器
 let bleManager:BleManager | null = null
   
-const BluetoothApi = {    
+const BluetoothApi = { 
+  /**
+   *  ** 初始化蓝牙管理器
+   *  @param successcallback
+   *  @param failurecallback
+   * 
+   **/   
   init: async(successcallback:CallbackType, failurecallback?:CallbackType) => {
       try {
             const res = await requestLocationPermission(blePermission);  
@@ -35,6 +44,11 @@ const BluetoothApi = {
             
         }
   },
+  /**
+   * 检查蓝牙是否已启用
+   * @param successcallback 
+   * @param failurecallback 
+   */
   isBluetoothEnabled: async (successcallback:CallbackType,failurecallback?:CallbackType) => {
     try {  
         const state:BleManagerState = await bleManager?.state();
@@ -52,6 +66,11 @@ const BluetoothApi = {
     }
     
   },
+  /**
+   * 监听蓝牙状态变化
+   *  @param successcallback
+   *  @param failurecallback
+   */
   listenBleStateChange: (successcallback:CallbackType,failurecallback?:CallbackType) => {
     try {
       bleManager?.onStateChange((state: BleManagerState) => {
@@ -71,6 +90,10 @@ const BluetoothApi = {
     }
     
   },
+  /**
+   * 启用蓝牙
+   * 
+   */
   enableBluetooth: async () => {
     try {
       const res = await bleManager?.enable()
@@ -79,7 +102,10 @@ const BluetoothApi = {
       
     }
   },
-  // 开始扫描蓝牙设备  
+  /**
+   * 开始扫描蓝牙设备
+   * @param dispatch redux dispatch
+   */
   startScanningDevices: (dispatch:Dispatch) => { 
     dispatch(startScanning());  
     try {  
@@ -115,11 +141,22 @@ const BluetoothApi = {
       // console.error('启动扫描失败:', error);  
     }  
   },    
-  // 停止扫描蓝牙设备  
-  stopScanningDevices: async (dispatch: any) => {  
+  /**
+   * 停止扫描蓝牙设备
+   *  @param dispatch redux dispatch
+   */
+  stopScanningDevices: async (dispatch: Dispatch) => {  
     dispatch(stopScanning());  
     await bleManager?.stopDeviceScan();  
   },  
+  /**
+   * 连接蓝牙设备
+   * @param deviceId 蓝牙设备id
+   * @param dispatch redux dispatch
+   * @param callback 连接成功回调
+   * @param failcallback 连接失败回调
+   * 
+   */
   connectToDevice: async ( deviceId: string,callback?:CallbackType,failcallback?:CallbackType) => {
     try {  
       const res = await bleManager?.connectToDevice(deviceId,{
@@ -139,6 +176,12 @@ const BluetoothApi = {
       })
     }  
   },
+  /**
+   * 发现蓝牙设备的服务和特征
+   * @param deviceId  蓝牙设备id
+   * @param successcallback 
+   * @param failcallback 
+   */
   discoverAllServicesAndCharacteristicsForDevice: async (deviceId: string,successcallback:CallbackType,failcallback?:CallbackType) => {
 
     
@@ -157,6 +200,12 @@ const BluetoothApi = {
       })
     }
   },
+  /**
+   * 发现蓝牙设备的服务
+   * @param deviceId  蓝牙设备id
+   * @param successcallback
+   *  @param failcallback
+   */
   findAllServices:async (deviceId: string,successcallback:CallbackType,failcallback?:CallbackType) => {
     try {
       const services = await bleManager?.servicesForDevice(deviceId);
@@ -176,6 +225,13 @@ const BluetoothApi = {
       })
     }
   },
+  /**
+   *  发现蓝牙设备的特征
+   * @param deviceId 蓝牙设备id
+   * @param serviceId   蓝牙服务id
+   * @param successcallback 
+   * @param failcallback 
+   */
   findCharacteristics:async (deviceId: string,serviceId:string,successcallback:CallbackType,failcallback?:CallbackType) => {
     try {
       const characteristics = await bleManager?.characteristicsForDevice(deviceId, serviceId);
@@ -207,6 +263,14 @@ const BluetoothApi = {
       })
     }  
   },
+  /**
+   * 监听蓝牙设备数据
+   * @param deviceId          蓝牙设备id
+   * @param serviceId         蓝牙服务id           
+   * @param characteristicId  蓝牙特征id
+   * @param successcallback 
+   * @param failcallback 
+   */
   notify:  (deviceId: string, serviceId: string, characteristicId: string, successcallback: CallbackType, failcallback?: CallbackType) => {
 
      
@@ -234,6 +298,15 @@ const BluetoothApi = {
         
       }
   },
+  /**
+   * 写入数据  无响应
+   * @param deviceId           蓝牙设备id
+   * @param serviceId          蓝牙服务id
+   * @param characteristicId   蓝牙设备id          
+   * @param data               发送的数据     
+   * @param successcallback 
+   * @param failcallback 
+   */
   writeOutData: async (deviceId: string, serviceId: string, characteristicId: string, data: string, successcallback: CallbackType, failcallback?: CallbackType) => {
     const sendVal = Buffer.from(data, 'hex').toString('base64');  
     try {
@@ -251,6 +324,16 @@ const BluetoothApi = {
       });
     }
   },
+  
+  /**
+   *  写入数据  有响应
+   * @param deviceId           蓝牙设备id
+   * @param serviceId          蓝牙服务id
+   * @param characteristicId   蓝牙设备id          
+   * @param data               发送的数据   
+   * @param successcallback 
+   * @param failcallback 
+   */
   writeData: async (deviceId: string, serviceId: string, characteristicId: string, data: string, successcallback: CallbackType, failcallback?: CallbackType) => {
     const sendVal = Buffer.from(data, 'hex').toString('base64');
     try {
@@ -268,6 +351,13 @@ const BluetoothApi = {
       });
     }     
   },
+  /**
+   * 设置蓝牙设备的MTU
+   * @param deviceId        蓝牙设备id
+   * @param mtu             MTU值
+   * @param successcallback 
+   * @param failcallback 
+   */
   setMTU: async (deviceId: string, mtu: number, successcallback: CallbackType, failcallback?: CallbackType) => {
     try {
       await bleManager?.requestMTUForDevice(deviceId, mtu);
@@ -282,6 +372,12 @@ const BluetoothApi = {
       });
     }
   },
+  /**
+   * 断开蓝牙设备连接
+   * @param deviceId 蓝牙设备id
+   * @param successcallback 
+   * @param failcallback 
+   */
   disConnect: async (deviceId: string, successcallback: CallbackType, failcallback?: CallbackType) => {
     try {
       await bleManager?.cancelDeviceConnection(deviceId);
@@ -296,6 +392,12 @@ const BluetoothApi = {
       });
     }
   },
+  /**
+   * 监听蓝牙设备断开连接
+   * @param deviceId 蓝牙设备id
+   * @param successcallback 
+   * @param failcallback 
+   */
   listenConnected: (deviceId: string,successcallback: CallbackType, failcallback?: CallbackType) => {
     try {
       bleManager?.onDeviceDisconnected(deviceId,(device,error)=>{
@@ -312,6 +414,11 @@ const BluetoothApi = {
       });
     }
   },
+  /**
+   * ASCII转Hex
+   * @param asciiString ASCII字符串
+   * @returns
+   */
   asciiToHex(asciiString: string): string {  
       let hexString = '';  
       for (let i = 0; i < asciiString.length; i++) {  
@@ -323,6 +430,11 @@ const BluetoothApi = {
       }  
       return hexString;  
   },
+  /**
+   * Hex转ASCII
+   * @param hex 
+   * @returns 
+   */
   hexToAscii(hex: string): string {  
       // 确保输入的hex字符串长度为偶数，如果不是，则进行填充  
       if (hex.length % 2 !== 0) {  
@@ -332,7 +444,7 @@ const BluetoothApi = {
       let asciiString = "";  
       for (let i = 0; i < hex.length; i += 2) {  
           // 从hex字符串中提取每两个字符作为一个字节  
-          const byteString = hex.substr(i, 2);  
+          const byteString = hex.slice(i, i + 2);  
           // 将字节字符串转换为数字（基数为16）  
           const byte = parseInt(byteString, 16);  
           // 将数字转换为对应的ASCII字符并添加到结果字符串中  

@@ -15,22 +15,34 @@ import moment from 'moment'
 
 const Content = () => {
   const dispatch = useDispatch();
+  // 从Redux中获取ble状态
   const {readParams,writeParams,isConnected} = useSelector((state:RootState) => state.ble)
+  // 从本地参数中获取设备ID
   const {deviceId} = useLocalSearchParams()
+  // 设置当前选项卡为'Services'
   const [tabs, setTabs] = useState<'Services'|'WR'>('Services')
+  // 设置是否正在连接
   const [isConnecting, setIsConnecting] = useState<boolean>(false)
+  // 设置循环时间
   const [xhTime, setXhTime] = useState<string>('')
+  // 设置服务列表
   const [serviceList, setServiceList] = useState<any[]>([])
+  // 设置写入值
   const [writeVal, setWriteVal] = useState<string>('')
+  // 设置日志数据
   const [logData, setLogData] = useState<any[]>([])
+    // 设置MTU值
   const [mtuVal, setMtuVal] = useState<string>('')
+  // 设置设备服务
   const [deviceServices, setDeviceServices] = useState<{[key:string]:any}>({})
+  // 设置发送、显示、循环开关的状态RadioProps
   const [radiaoVal, setRadiaoVal] = useState<RadioProps>({
     send:1,
     recv:1,
     isLoop:2
   })
 
+  // 添加日志
   const addLog = useCallback((data:AddMsgProps) => {
     if(data.timestr === undefined){
       data.timestr = moment().format('HH:mm:ss.SSS')//获取当前时间;
@@ -38,6 +50,7 @@ const Content = () => {
     setLogData(pre=>[...pre,data])
   },[logData])
   
+  // 监听isConnected状态变化 ，当连接成功时，获取设备服务
   useEffect(() => {
     if(isConnected){
       Toast.show({  
@@ -59,7 +72,6 @@ const Content = () => {
           })
         }); 
         
-        // console.log(characteristics);
         Promise.all(promises).then(results => {
           setServiceList(results)
         }).catch(error => {
@@ -82,7 +94,7 @@ const Content = () => {
     }
   },[isConnected])
 
-  
+  // 组件卸载时断开连接
   useEffect(() => {
     
     return ()=>{
@@ -92,7 +104,8 @@ const Content = () => {
       })
     }
   },[])
- 
+  
+  // 处理选项卡切换     
   const handelTabs = useCallback((tabsVal:'WR'|'Services') => {
     setTabs(tabsVal)
     if(tabsVal === 'WR'){
@@ -120,6 +133,7 @@ const Content = () => {
     }
   },[deviceServices,serviceList,dispatch])
   
+  // 监听readParams变化 并执行read操作
   useEffect(()=>{
     if(readParams.serviceUUID && readParams.characteristicUUID&&deviceId&&tabs==='WR'){
       BluetoothApi.notify(deviceId as string,readParams.serviceUUID,readParams.characteristicUUID, res => {
@@ -134,6 +148,7 @@ const Content = () => {
    
   },[readParams, deviceId,radiaoVal,tabs])
 
+  // 处理设备服务选择 并设置到redux中
   const handleSelect = useCallback((tzIndex:number,serIndex:number,type:string,status:boolean) => {
       setDeviceServices(pre=>({
         ...pre,
@@ -141,11 +156,14 @@ const Content = () => {
       }))
     },[deviceServices])
 
+  // 获取显示、发送、是否开启循环的状态
   const getRadioValue = useCallback((value:number,type:'send'|'recv'|'isLoop') => {
     
     setRadiaoVal(prev=>({...prev,[type]:value}))   
     
   },[radiaoVal])
+
+  // 发送蓝牙数据      
   const senBleData = useCallback((data:string) => {
   
     let sendData = radiaoVal.send === 1?data:BluetoothApi.asciiToHex(data)
@@ -166,6 +184,7 @@ const Content = () => {
     } 
   },[radiaoVal,writeParams])
 
+  // 监听radiaoVal.isLoop变化 开启循环发送
   useEffect(() => {
     
     if(radiaoVal.isLoop ===  1){
@@ -182,6 +201,8 @@ const Content = () => {
  
     }
   },[radiaoVal.isLoop])
+
+    // 处理发送   
   const handleSend = useCallback(() => {
 
     if(writeVal === ''){
@@ -194,6 +215,7 @@ const Content = () => {
     senBleData(writeVal)
   },[writeVal,radiaoVal])
 
+  // 处理设置MTU      
   const handleSetMTU = useCallback(() => {
     
     if(mtuVal === ''){
@@ -218,10 +240,12 @@ const Content = () => {
     })
   },[mtuVal])
 
+  // 设置循环时间
   const handleTimeChange = useCallback((text:string) => {
     setXhTime(text)
   },[])
 
+  // 处理设备断开后手动连接
   const handleConnect = useCallback(() => {
     setIsConnecting(true)
     BluetoothApi.connectToDevice(deviceId as string,res=>{
@@ -237,7 +261,7 @@ const Content = () => {
   },[deviceId,dispatch])
   return (
     <SafeAreaView style={tw`flex-1`}>
-      <HeadItem icon={icons.set} title='设置' handlePress={()=>{router.push('/set')}}/>  
+      <HeadItem  title='设置'/>  
         <View style={tw`flex-1 bg-white`}>
           <View  style={tw`flex-row justify-between px-4 bg-white pb-2`}>
             
@@ -321,7 +345,7 @@ const Content = () => {
                     id:'1',
                   }]}
                 /> */}
-                <View style={tw`flex-row justify-start items-center`}>
+                <View style={tw`flex-row justify-start items-center ml-4`}>
                   <Text>发送频率</Text>
                   <TextInput onChangeText={handleTimeChange} style={tw`border-b w-[20] text-base text-center`} keyboardType="numeric" value={xhTime}/>
                   <Text>(秒/次)</Text>

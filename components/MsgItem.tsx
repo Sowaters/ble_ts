@@ -3,9 +3,13 @@ import React, { memo } from 'react'
 import tw from 'twrnc'
 import { MsgProps } from '@/types/types'
 
+/**
+ * MsgItem组件，用于显示消息内容
+ * @param {MsgProps} props - 消息属性
+ * @returns {JSX.Element} - 返回一个View组件，包含Text组件和根据type属性的不同显示不同的Text组件
+ * 
+ */
 const MsgItem = memo(({msg,type,timestr}:MsgProps) => {
-    
-    
     return (
     <View style={tw`flex-row items-center justify-start`}>
       <Text>{timestr+'>>'}</Text>

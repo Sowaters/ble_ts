@@ -4,12 +4,21 @@ import ButtonItem from './ButtonItem'
 import tw from 'twrnc'
 import {BluetoothDevice} from '@/types/types'
 
+/**
+ *  deviceItemProps 
+ *  @param device:BluetoothDevice
+ *  @param handleClick:()=> void
+ *  @param isLoading?:boolean
+ *  @param deviceWrapStyle?: string|undefined
+ * 
+ */
 interface deviceItemProps {
     device:BluetoothDevice
     handleClick:()=> void
     isLoading?:boolean
     deviceWrapStyle?: string|undefined
 }
+
 const DeviceItem = memo(({
       device,
       handleClick,
@@ -24,6 +33,7 @@ const DeviceItem = memo(({
       <View style={tw`flex-col bg-white border-b`}>
         <TouchableHighlight activeOpacity={0.9} onPress={() =>setShowSubItems(!showSubItems)}>
           <View style={tw`flex-row bg-white justify-between py-4 border-gray-600 px-4 ${deviceWrapStyle}`}>
+
               <View style={tw`flex-row items-center`}>
                   <View style={tw`w-10 h-10 rounded-full mr-2 items-center justify-center`}>
                       <Text style={tw`font-black`}>{device.rssi}</Text>
