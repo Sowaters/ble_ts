@@ -1,3 +1,5 @@
+项目演示视频 https://www.bilibili.com/video/BV13G2gYBEQz
+安装包http://fir.maxhom.com/rgzwhjtx
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
