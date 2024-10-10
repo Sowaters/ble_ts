@@ -1,3 +1,4 @@
+项目演示视频 https://www.bilibili.com/video/BV13G2gYBEQz/?pop_share=1&vd_source=29f7e05dcb1f699336046d8af739b95e
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
