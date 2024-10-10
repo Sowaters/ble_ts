@@ -2,10 +2,10 @@
   "expo": {
     "name": "ble_ts",
     "slug": "ble_ts",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "ble_react_ts",
+    "scheme": "ble-ts",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",

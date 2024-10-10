@@ -9,13 +9,14 @@ import { StatusBar } from 'expo-status-bar'
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-
+  console.log("layout")
   // 在组件挂载时初始化蓝牙API
   useEffect(() => {
    
     BluetoothApi.init((result)=>{
 
     })
+    SplashScreen.hideAsync();
   },[])
   
   return (
